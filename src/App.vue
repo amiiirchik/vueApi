@@ -8,15 +8,20 @@
     </div>
     <button class="btn primary" :disabled="name.length === 0">Создать</button>
   </form>
-  <AddPeopleList :people="people" />
+  <AddPeopleList :people="people" @load="loadPeople"/>
 </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 import AddPeopleList from './components/AddPeopleList.vue'
+
 let name = ref('')
 console.log(name.value)
+
+let people = ['test']
+
 
 async function createPerson(){
   const response = await fetch('https://database-a2210-default-rtdb.firebaseio.com/people.json', {
@@ -33,6 +38,17 @@ async function createPerson(){
   console.log(firebaseData)
   name.value = ''
 
+}
+
+async function loadPeople(){
+  const { response } = await axios.get('https://database-a2210-default-rtdb.firebaseio.com/people.json')
+  console.log(response)
+  people = Object.keys(data).map(key => {
+    return{
+      id: key,
+      firstName: response[key].firstName
+    }
+  })
 }
 
 
