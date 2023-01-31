@@ -12,7 +12,6 @@
 
 <div class="card center">
     <h4 v-if="people.length == 0">Людей пока нет</h4>
-    <p v-else>{{ people }}</p>
     <button class="btn" @click="$emit('load')">Загрузить список</button>
 </div>
 </template>

@@ -1,5 +1,6 @@
 <template>
 <div class="container">
+  <AppAlert :alert="alert" />
   <form class="card" @submit.prevent="createPerson">
     <h2>Работа с базой данных</h2>
     <div class="card">
@@ -7,6 +8,11 @@
       <input name="" id="name" v-model.trim="name">
     </div>
     <button class="btn primary" :disabled="name.length === 0">Создать</button>
+    <AppLoader
+      v-if="loading"
+
+    >
+    </AppLoader>
   </form>
   <AddPeopleList :people="people" @load="loadPeople" @remove="removePerson"/>
 </div>
@@ -16,9 +22,12 @@
 import { ref, reactive } from 'vue'
 import axios from 'axios'
 import AddPeopleList from './components/AddPeopleList.vue'
+import AppAlert from './components/AppAlert.vue'
+import AppLoader from './components/AppLoader.vue'
 
 let name = ref('')
 let people = reactive([])
+let loading = ref()
 
 async function createPerson(){
   const response = await fetch('https://database-a2210-default-rtdb.firebaseio.com/people.json', {
@@ -43,18 +52,17 @@ async function createPerson(){
 
 async function loadPeople(){
   try{
+    loading = true
+
     const { response } = await axios.get('https://database-a2210-default-rtdb.firebaseio.com/people.json')
     
-    if(!response){
-      throw new Error('Список пуст')
-    }
+    if(!response) throw new Error('Список пуст')
 
     people = Object.keys(response).map(key => {
-      return {
-        id: key,
-        firstName: response[key].firstName
-      }
+      id: key
+      firstName: response[key].firstName
     })
+    loading = false
   } 
   catch (e){
     alert = {
@@ -63,7 +71,6 @@ async function loadPeople(){
       text: e.message,
     }
     console.log(e)
-
   }
   
   
@@ -71,8 +78,23 @@ async function loadPeople(){
 }
 
 async function removePerson(id){
-  await axios.delete(`https://database-a2210-default-rtdb.firebaseio.com/people/${id}.json`)
-  people = people.filter(person => person.id != id)
+  try {
+    let name = people.find(person => person.id == id).firstName
+    await axios.delete(`https://database-a2210-default-rtdb.firebaseio.com/people/${id}.json`)
+    people = people.filter(person => person.id != id)
+
+    alert = {
+      type: 'primary',
+      title: 'Успешно',
+      text: `Пользователь с именем ${name}`
+    }
+  } catch(e) {
+    alert('Alert')
+  }
+
+
+
+
 }
 
 </script>
