@@ -18,10 +18,7 @@ import axios from 'axios'
 import AddPeopleList from './components/AddPeopleList.vue'
 
 let name = ref('')
-console.log(name.value)
-
 let people = ['test']
-
 
 async function createPerson(){
   const response = await fetch('https://database-a2210-default-rtdb.firebaseio.com/people.json', {
@@ -37,23 +34,18 @@ async function createPerson(){
   const firebaseData = await response.json()
   console.log(firebaseData)
   name.value = ''
-
 }
 
 async function loadPeople(){
-  const { response } = await axios.get('https://database-a2210-default-rtdb.firebaseio.com/people.json')
+  const response = await axios.get('https://database-a2210-default-rtdb.firebaseio.com/people.json')
   console.log(response)
-  people = Object.keys(data).map(key => {
+  people = Object.keys(response).map(key => {
     return{
       id: key,
       firstName: response[key].firstName
     }
   })
+  console.log(people)
 }
 
-
 </script>
-
-<style>
-
-</style>

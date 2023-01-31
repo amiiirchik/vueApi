@@ -18,7 +18,6 @@
 
 <script setup>
     const props = defineProps({
-        people: Array,
-        
+        people: Array
     })
 </script>
